@@ -1,0 +1,234 @@
+# ====================================================================================== #
+#
+#  Workflow : AWS EKS CI 파이프라인
+#
+#  Workflow 설명 :
+#    - Docker Build 및 ECR에 컨테이너를 Push
+#      : 개발 소스에 대한 빌드는 Dockerfile에서 multi-stage 빌드로 수행 필요
+#         ** multi-stage 빌드 사용을 안할 경우 Workflow 내에 소스 빌드 단계를 수동으로 추가
+#    - 새로 생성된 이미지 ID를 config Repository에 반영하여 CD 파이프라인을 트리거 함
+#
+#  Workflow 상세 가이드 :
+#    - https://lgu-cto.atlassian.net/wiki/spaces/CLOUDASSET/pages/37479319390/AWS-EKS+CI+CD+Workflow
+#
+#  버전 : v1.1 
+#
+# ====================================================================================== #
+name: AWS EKS CI 파이프라인
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+    tags:
+      - PROD*
+    paths-ignore:
+      - '.github/**'
+
+env:
+  # AWS 변수
+  AWS_REGION: ap-northeast-2
+  CONFIG_REPO_YAML_DIR: aws-eks
+  # 소스 코드 빌드 변수 - Dockerfile multi-satge 빌드 사용 안할 경우 사용
+#  JAVA_VERSION : 11                       # JAVA REF: https://github.com/marketplace/actions/setup-java-jdk
+#  JAVA_DISTRIBUTION : temurin             # JAVA REF 링크를 참고하여 필요 Java 버전 및 Distribution을 설정
+
+
+jobs:
+  # 1. Check CI Environment (CI 환경 확인)
+  #   - Workflow 트리거 유형에 따른 CI 환경 확인 및 설정
+  #     : dev 브랜치 push = 개발 배포 용 CI
+  #     : main 브랜치 push = 검수 배포 용 CI
+  #     : PROD Release(Tag) 생성 = 상용 배포 용 CI
+  #        * Release가 main 브랜치에서 생성된게 아닐 경우 실패 처리됨
+  env-set:
+    name: 1. Check CI Environment
+    runs-on: ubuntu-latest
+    outputs:
+      ci-env: ${{ steps.ci-env-set.outputs.ci-env }}
+      cfgstore-branch: ${{ steps.ci-env-set.outputs.cfgstore-branch }}
+
+    steps:
+    - name: DEV 빌드
+      if: github.ref_name == 'dev'
+      run: |
+        DEPLOY_ENV=dev
+        CFGSTORE_BRANCH=dev
+
+        echo "DEPLOY_ENV=${DEPLOY_ENV}" >> $GITHUB_ENV
+        echo "CFGSTORE_BRANCH=${CFGSTORE_BRANCH}" >> $GITHUB_ENV
+
+    - name: QA 빌드
+      if: github.ref_name == 'main'
+      run: |
+        DEPLOY_ENV=qa
+        CFGSTORE_BRANCH=qa
+
+        echo "DEPLOY_ENV=${DEPLOY_ENV}" >> $GITHUB_ENV
+        echo "CFGSTORE_BRANCH=${CFGSTORE_BRANCH}" >> $GITHUB_ENV
+
+
+    - name: PROD 빌드
+      if: startsWith(github.ref_name, 'PROD')
+      run: |
+        if [ -z ${{ github.event.base_ref }} ]
+        then
+          BASE_REF=none
+        else
+          BASE_REF=${{ github.event.base_ref }}
+        fi
+        
+        if [[ ${BASE_REF} != "refs/heads/main" ]]
+        then
+          echo "MAIN이 아닌 다른 브랜치에서 PROD Tag 생성됨"
+          exit 1
+        fi
+
+        ORGA_NAME=`echo ${{ github.repository_owner }} | tr "[:upper:]" "[:lower:]"`
+        if [[ ${ORGA_NAME} == "ucmp-dev-work-org" || ${ORGA_NAME} == "ucmp-prod-work-org" ]]
+        then
+          DEPLOY_ENV=prod-ucmp-temp
+        else
+          DEPLOY_ENV=prod
+        fi
+        CFGSTORE_BRANCH=prod
+
+        echo "DEPLOY_ENV=${DEPLOY_ENV}" >> $GITHUB_ENV
+        echo "CFGSTORE_BRANCH=${CFGSTORE_BRANCH}" >> $GITHUB_ENV
+
+    - name: CI 환경 설정
+      id: ci-env-set
+      run: |
+        echo "::set-output name=ci-env::${DEPLOY_ENV}"
+        echo "::set-output name=cfgstore-branch::${CFGSTORE_BRANCH}"
+
+  # 2. Source Build and Update Config Repo (빌드 및 Config Repo 업데이트)
+  #   - 소스 코드 및 컨테이너 빌드 후 ECR에 컨테이너를 push
+  #      ** 상용 배포의 경우 빌드 단계는 Skip 되며 검수 환경에 배포되었던 이미지를 사용함
+  build:
+    needs: env-set
+    name: 2. Source Build and Update Config Repo
+    runs-on: ubuntu-latest
+      
+    steps:
+    - name: AWS 변수 설정
+      run: |
+        if [[ ${{ needs.env-set.outputs.ci-env }} == "dev" ]]
+        then
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.DEV_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_ECR_REGISTRY=${{ secrets.DEV_AWS_ECR_REGISTRY }}" >> $GITHUB_ENV
+        elif [[ ${{ needs.env-set.outputs.ci-env }} == "qa" ]]
+        then
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.QA_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.QA_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_ECR_REGISTRY=${{ secrets.QA_AWS_ECR_REGISTRY }}" >> $GITHUB_ENV
+        elif [[ ${{ needs.env-set.outputs.ci-env }} == "prod" || ${{ needs.env-set.outputs.ci-env }} == "prod-ucmp-temp" ]]
+        then
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.PROD_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_ECR_REGISTRY=${{ secrets.QA_AWS_ECR_REGISTRY }}" >> $GITHUB_ENV
+        else
+          exit 1
+        fi
+
+    - name: 소스 코드 Checkout
+      if: needs.env-set.outputs.ci-env != 'prod'
+      uses: actions/checkout@v3
+
+    - name: AWS Credentials 설정
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+# ========================================================================== #
+#    소스 코드 빌드 영역 (Dockerfile multi-stage 빌드 사용 안 할 경우)
+# ========================================================================== #
+#    - name: Java 환경 구성
+#      if: needs.env-set.outputs.ci-env != 'prod'
+#      uses: actions/setup-java@v3
+#      with:
+#        distribution: ${{ env.JAVA_DISTRIBUTION }}
+#        java-version: ${{ env.JAVA_VERSION }}
+#
+#    - name: Gradlew 빌드 수행
+#      if: needs.env-set.outputs.ci-env != 'prod'
+#      run: |
+#        chmod +x gradlew
+#        ./gradlew clean build
+#
+#        cd ./${ARTIFACT_PATH}
+#        tar -cvf ${ARTIFACT_NAME} ./*jar
+#        ls ./
+#
+# ========================================================================== #
+
+    - name: AWS ECR 로그인
+      id: login-ecr
+      if: needs.env-set.outputs.ci-env != 'prod'
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: ECR Repository 및 Tag 설정
+      run: |
+        ORGA_NAME=`echo ${{ github.repository_owner }} | tr "[:upper:]" "[:lower:]"`
+        REPO_NAME=`echo ${GITHUB_REPOSITORY} | awk -F / '{ print $2 }' | tr "[:upper:]" "[:lower:]"`
+
+        if [[ ${ORGA_NAME} == "ucmp-dev-work-org" || ${ORGA_NAME} == "ucmp-prod-work-org" ]]
+        then
+          ORGA_NAME=`echo ${{ secrets.ORGA_NAME }} | tr "[:upper:]" "[:lower:]"`
+          REPO_NAME=`echo ${{ secrets.REPO_NAME }} | tr "[:upper:]" "[:lower:]"`
+        fi
+        
+        if [[ ${{ needs.env-set.outputs.ci-env }} == "prod" || ${{ needs.env-set.outputs.ci-env }} == "prod-ucmp-temp" ]]
+        then
+          ECR_ENV=qa
+        else
+          ECR_ENV=${{ needs.env-set.outputs.ci-env }}
+        fi
+
+        echo "ECR_REPOSITORY=`echo ecr-${ECR_ENV}-${ORGA_NAME}-${REPO_NAME}`" >> $GITHUB_ENV
+        echo "IMAGE_TAG=`echo ${{ github.sha }} | cut -c1-8`" >> $GITHUB_ENV
+
+    - name: Docker 빌드 및 ECR로 Push
+      if: needs.env-set.outputs.ci-env != 'prod'
+      run: |
+        docker build -t ${AWS_ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} -f Dockerfile .
+        docker push ${AWS_ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
+
+    - name: (PROD) QA 배포 이미지 확인
+      if: needs.env-set.outputs.ci-env == 'prod'
+      run: |
+        REGISTRY_ID=`echo ${AWS_ECR_REGISTRY} | awk -F . '{ print $1 }'`
+        aws ecr describe-images --registry-id ${REGISTRY_ID} --repository-name=${ECR_REPOSITORY} --image-ids=imageTag=${IMAGE_TAG}
+
+    - name: Config Repo Checkout
+      uses: actions/checkout@v3
+      with:
+        path: config-repo
+        repository: ${{ github.repository }}-cfgstore
+        ref: ${{ needs.env-set.outputs.cfgstore-branch }}
+        token: ${{ secrets.GHP_TOKEN }}
+
+    - name: Config Repo 업데이트
+      run: |
+        echo "=== deployment.yaml 컨테이너 Image 변경 ==="
+        DEPLOYMENT_FILE="config-repo/${{ env.CONFIG_REPO_YAML_DIR }}/${{ needs.env-set.outputs.cfgstore-branch }}-yaml/deployment.yaml"
+        yq eval -i ".spec.template.spec.containers[0].image = \"${AWS_ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}\"" ${DEPLOYMENT_FILE}
+
+        COMMIT_INFO_FILE=config-repo/source_commit-id.dat
+        echo "=== 소스 코드 Commit ID Config Repo에 기록 ==="
+        echo ${{ github.sha }} > ${COMMIT_INFO_FILE}
+        echo ${{ github.ref_name }} >> ${COMMIT_INFO_FILE}
+
+    - name: 이미지 ID 변경 Commit Push
+      working-directory: config-repo
+      run: |
+        REPO_NAME=`echo ${GITHUB_REPOSITORY} | awk -F / '{ print $2 }'`
+        git config user.name ci.${REPO_NAME}
+        git config user.email ci.${REPO_NAME}@lguplus.co.kr
+        git add .
+        git commit -m "From Build - ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"
+        git push
