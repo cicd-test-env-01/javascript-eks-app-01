@@ -5,8 +5,8 @@ const config = require('config')
 const PORT = 8080
 const HOST = '0.0.0.0'
 
-const dbUser = config.get('database.dbUser')
-const dbPassword = config.get('database.dbPassword')
+const dbUser = config.get('Dababase.dbUser')
+const dbPassword = config.get('Dababase.dbPassword')
 
 // App
 const app = express()
