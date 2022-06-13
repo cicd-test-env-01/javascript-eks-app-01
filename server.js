@@ -12,8 +12,9 @@ const HOST = '0.0.0.0'
 
 const dbUser = config.get('Database.dbUser')
 const dbPassword = config.get('Database.dbPassword')
+const dbPasswordEncrypt = config.get('Database.dbPassword')
 
-const { dbPasswordPlain, messageHeader } = await decrypt(keyring, dbPassword)
+const { dbPasswordPlain, messageHeader } = await decrypt(keyring, dbPasswordEncrypt)
 
 // App
 const app = express()
@@ -25,5 +26,5 @@ app.get('', (req, res) => {
 
 app.listen(PORT, HOST)
 console.log(
-  `DB : ${dbUser} ${dbPasswordPlain} Running on http://${HOST}:${PORT}`
+  `DB : ${dbUser} ${dbPassword} ${dbPasswordPlain} Running on http://${HOST}:${PORT}`
 )

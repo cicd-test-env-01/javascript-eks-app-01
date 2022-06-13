@@ -9,6 +9,6 @@
   "dependencies": {
     "express": "^4.16.1",
     "config": "3.3.7",
-    "@aws-sdk/client-kms"
+    "@aws-sdk/client-kms": "3.105.0"
   }
 }
