@@ -1,12 +1,12 @@
 const express = require('express')
-var config = require('./config/config.json')
+const config = require('config')
 
 // Constants
 const PORT = 8080
 const HOST = '0.0.0.0'
 
-const db_user = config.get('db_user')
-const db_password = config.get('db_password')
+const db_user = config.get('server.db_user')
+const db_password = config.get('server.db_password')
 
 // App
 const app = express()
