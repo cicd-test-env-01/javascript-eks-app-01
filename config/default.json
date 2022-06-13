@@ -1,6 +1,6 @@
 {
-  "database": {
-    "db_user": "username",
-    "db_password": "password"
+  "Database": {
+    "dbUser": "username",
+    "dbPassword": "password"
   }
 }
