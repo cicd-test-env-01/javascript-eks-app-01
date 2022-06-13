@@ -1,18 +1,13 @@
-'use strict';
+const express = require('express')
+const config = require('./config/config.json')
+const app = express()
+const db_user = config.get('server.db_user')
+const db_password = config.get('server.db_password')
 
-const express = require('express');
-
-// Constants
-const PORT = 8080;
-const HOST = '0.0.0.0';
-
-// App
-const app = express();
-app.use(express.static(__dirname+'/static'))
+app.use(express.static(__dirname + '/static'))
 
 app.get('', (req, res) => {
   res.sendFile(__dirname + '/index.html')
 })
 
-app.listen(PORT, HOST);
-console.log(`Running on http://${HOST}:${PORT}`);
+console.log(`DB Credentials : ${db_user}:${db_password}`)
