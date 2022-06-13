@@ -1,8 +1,9 @@
 const express = require('express')
-const config = require('./config/config.json')
 const app = express()
-const db_user = config.get('server.db_user')
-const db_password = config.get('server.db_password')
+
+var config = require('./app/config.json')
+const db_user = config.get('database.db_user')
+const db_password = config.get('database.db_password')
 
 app.use(express.static(__dirname + '/static'))
 
