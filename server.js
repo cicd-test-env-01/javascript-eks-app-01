@@ -1,3 +1,4 @@
+// Module
 const express = require('express')
 const config = require('config')
 
@@ -5,8 +6,8 @@ const config = require('config')
 const PORT = 8080
 const HOST = '0.0.0.0'
 
-const dbUser = config.get('Dababase.dbUser')
-const dbPassword = config.get('Dababase.dbPassword')
+const dbUser = config.get('Database.dbUser')
+const dbPassword = config.get('Database.dbPassword')
 
 // App
 const app = express()
