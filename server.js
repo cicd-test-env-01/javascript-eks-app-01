@@ -1,13 +1,19 @@
-// Module
+// Constants
 const express = require('express')
 const config = require('config')
 
-// Constants
+const keyIds = [
+  'arn:aws:kms:ap-northeast-2:521651615177:key/6ca496ce-938b-4038-af90-e1614da7535c',
+]
+const keyring = new KmsKeyringNode({ generatorKeyId, keyIds })
+
 const PORT = 8080
 const HOST = '0.0.0.0'
 
 const dbUser = config.get('Database.dbUser')
 const dbPassword = config.get('Database.dbPassword')
+
+const { dbPasswordPlain, messageHeader } = await decrypt(keyring, dbPassword)
 
 // App
 const app = express()
@@ -18,4 +24,6 @@ app.get('', (req, res) => {
 })
 
 app.listen(PORT, HOST)
-console.log(`DB : ${dbUser} ${dbPassword} Running on http://${HOST}:${PORT}`)
+console.log(
+  `DB : ${dbUser} ${dbPasswordPlain} Running on http://${HOST}:${PORT}`
+)
