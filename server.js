@@ -6,7 +6,7 @@ const PORT = 8080
 const HOST = '0.0.0.0'
 
 const db_user = config.get(db_user)
-const db_user = config.get(db_password)
+const db_password = config.get(db_password)
 
 // App
 const app = express()
