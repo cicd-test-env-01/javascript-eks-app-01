@@ -1,3 +1,5 @@
+import { KMSClient, DecryptCommand } from '@aws-sdk/client-kms'
+
 // Constants
 const express = require('express')
 const config = require('config')
@@ -14,7 +16,9 @@ const dbUser = config.get('Database.dbUser')
 const dbPassword = config.get('Database.dbPassword')
 const dbPasswordEncrypt = config.get('Database.dbPassword')
 
-const { dbPasswordPlain, messageHeader } = await decrypt(keyring, dbPasswordEncrypt)
+// const client = new KMSClient(config)
+const command = new DecryptCommand(dbPasswordEncrypt)
+const dbPasswordPlain = await client.send(command)
 
 // App
 const app = express()
