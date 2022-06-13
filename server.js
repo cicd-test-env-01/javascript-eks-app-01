@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 
-var config = require('./app/config.json')
+var config = require('/config/config.json')
 const db_user = config.get('database.db_user')
 const db_password = config.get('database.db_password')
 
