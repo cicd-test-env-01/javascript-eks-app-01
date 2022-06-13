@@ -1,4 +1,4 @@
-import { KMSClient, DecryptCommand } from '@aws-sdk/client-kms'
+const { KMSClient, DecryptCommand } = require('@aws-sdk/client-kms')
 
 // Constants
 const express = require('express')
