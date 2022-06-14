@@ -1,23 +1,28 @@
-const { KMSClient, DecryptCommand } = require('@aws-sdk/client-kms')
-
 // Constants
 const express = require('express')
 const config = require('config')
 
+const DecryptCommand = require('@aws-sdk/client-kms')
+
 const keyIds = [
   'arn:aws:kms:ap-northeast-2:521651615177:key/6ca496ce-938b-4038-af90-e1614da7535c',
 ]
-const keyring = new KmsKeyringNode({ generatorKeyId, keyIds })
 
 const PORT = 8080
 const HOST = '0.0.0.0'
 
 const dbUser = config.get('Database.dbUser')
 const dbPassword = config.get('Database.dbPassword')
-const dbPasswordEncrypt = config.get('Database.dbPassword')
+const dbPasswordEncrypted = config.get('Database.dbPassword')
+
+const decryptInput = {
+  CiphertextBlob: dbPasswordEncrypted,
+  EncryptionAlgorithm: 'RSAES_OAEP_SHA_256',
+  KeyId: keyIds,
+}
 
 // const client = new KMSClient(config)
-const command = new DecryptCommand(dbPasswordEncrypt)
+const command = new DecryptCommand(decryptInput)
 const dbPasswordPlain = await client.send(command)
 
 // App
