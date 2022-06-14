@@ -6,8 +6,13 @@ const config = require('config')
 const PORT = 8080
 const HOST = '0.0.0.0'
 
+// Configuration from config.js
 const val1 = config.get('Server.key1')
 const val2 = config.get('Server.key2')
+
+// Configuration from Env. Variable
+const dbUser = process.env.DB_USER
+const dbPassword = process.env.DB_PASSWORD
 
 // App
 const app = express()
@@ -18,4 +23,6 @@ app.get('', (req, res) => {
 })
 
 app.listen(PORT, HOST)
-console.log(`Conf: ${val1} ${val2}, Running on http://${HOST}:${PORT}`)
+console.log(
+  `Conf: ${val1} ${val2}, DB: ${dbUser} ${dbPassword}, Running on http://${HOST}:${PORT}`
+)
