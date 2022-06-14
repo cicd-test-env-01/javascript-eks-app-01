@@ -1,7 +1,6 @@
 {
-  "Database": {
-    "dbUser": "username",
-    "dbPassword": "password",
-    "dbPasswordEncrypt": "JKXCAedy5VSqCpMWmRluZlB2lNUH6u1wWa+ErlFsO+lIbeLEhFT7vvXGJwwJSicoNLZvUP7e0IyY/EM7NH9eJ4zYiDxUAsmyLUZNhNpMLYhLfMiTRzFofOtNyRUHsHW+Z1vi03dzUbLnpJFM/+n0xRtURqhJ30p+RFZAT22+9y5LRyinTpI4ibI8ehKI2ozs9X97PZSVDitsDSkqM5ILf6k+hka5vxv4mgGtPvANKFLrUKPwElYVxfV1SPUmLj0ffR9SffAWCMe0B9B0CElKjUHXfQZSqyMl172BUuW0BdB6vlQ+AtqwjxE0rRuhGluGmY4SKyrVUP6kP+cnc0aOLVV6GzWkBuF92EUJhLAPmZ+lr0iYdlQPtIL8ACl0PCpo7YC9Qke6OsCoMc/DL6zZ8QXmaCGUZrg8YngxGKVWQkBwdd3qAJxcWRea9v2lHMo7eSsCV4RGhK5B9sgtzSvshxv/DSl67sg7qy7kFNBfRLSodfCNsQVy1aNy9YAzwUTpECBGcKDz/TmnDx8g5C159W0+x6QIQ03AJlnvnPLt+dpNtKJ/8ZJBI3qL/N21jRTgKFGsgypvUrvoqknajK/w0D2WSRc5g5y82LtsORL11ImKjv23JAdUpfcJjPRoGg4WlFr/mfgQw63upefWNlz/b3Hg8+bzghMOPePor4bEyB0="
+  "Server": {
+    "key1": "val1",
+    "key2": "val2"
   }
 }

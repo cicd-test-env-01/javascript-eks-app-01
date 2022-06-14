@@ -1,13 +1,17 @@
-// Module
-const express = require('express')
-const config = require('config')
-
 // Constants
+const express = require('express')
+
 const PORT = 8080
 const HOST = '0.0.0.0'
 
-const dbUser = config.get('Database.dbUser')
-const dbPassword = config.get('Database.dbPassword')
+// Configuration from config.js
+const config = require('config')
+const val1 = config.get('Server.key1')
+const val2 = config.get('Server.key2')
+
+// Configuration from Env. Variable
+const dbUser = process.env.DB_USER
+const dbPassword = process.env.DB_PASSWORD
 
 // App
 const app = express()
@@ -18,4 +22,6 @@ app.get('', (req, res) => {
 })
 
 app.listen(PORT, HOST)
-console.log(`DB : ${dbUser} ${dbPassword} Running on http://${HOST}:${PORT}`)
+console.log(
+  `DB: ${dbUser} ${dbPassword}, Conf: ${val1} ${val2}, Running on http://${HOST}:${PORT}`
+)
