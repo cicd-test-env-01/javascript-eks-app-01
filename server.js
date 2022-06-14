@@ -21,9 +21,15 @@ const decryptInput = {
   KeyId: keyIds,
 }
 
-// const client = new KMSClient(config)
-const command = new DecryptCommand(decryptInput)
-const dbPasswordPlain = await client.send(command)
+async function decrypt() {
+  // const client = new KMSClient(config)
+  const command = new DecryptCommand(decryptInput)
+  const dbPasswordPlain = await client.send(command)
+
+  alert(dbPasswordPlain)
+}
+
+const dbPasswordPlain = decrypt()
 
 // App
 const app = express()
