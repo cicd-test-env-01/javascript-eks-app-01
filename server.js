@@ -11,6 +11,7 @@ const val1 = config.get('Server.key1')
 const val2 = config.get('Server.key2')
 
 var AWS = require('aws-sdk')
+AWS.config.update({ region: 'ap-northeast-2' })
 var kms = new AWS.KMS()
 
 var params = {
