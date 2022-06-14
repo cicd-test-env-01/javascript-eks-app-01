@@ -6,8 +6,8 @@ const config = require('config')
 const PORT = 8080
 const HOST = '0.0.0.0'
 
-const dbUser = config.get('Database.dbUser')
-const dbPassword = config.get('Database.dbPassword')
+const val1 = config.get('Server.key1')
+const val2 = config.get('Server.key2')
 
 // App
 const app = express()
@@ -18,4 +18,4 @@ app.get('', (req, res) => {
 })
 
 app.listen(PORT, HOST)
-console.log(`DB : ${dbUser} ${dbPassword} Running on http://${HOST}:${PORT}`)
+console.log(`Conf: ${val1} ${val2}, Running on http://${HOST}:${PORT}`)
