@@ -7,7 +7,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "@aws-sdk/client-kms": "^3.105.0",
+    "aws-sdk": "^2.1153.0",
     "config": "3.3.7",
     "express": "^4.16.1"
   }
