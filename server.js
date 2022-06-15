@@ -1,6 +1,4 @@
 const express = require('express')
-const PORT = 8080
-const HOST = '0.0.0.0'
 
 // External Config 샘플 (config.js)
 const config = require('config')
@@ -25,11 +23,15 @@ async function decrypt(source) {
   return Plaintext.toString()
 }
 
+// 복호화 검증을 위한 샘플
 decrypt(dbUser).then((decoded) => console.log(decoded))
 decrypt(dbPassword).then((decoded) => console.log(decoded))
 
-// App
+// 샘플 App
 const app = express()
+const PORT = 8080
+const HOST = '0.0.0.0'
+
 app.use(express.static(__dirname + '/static'))
 
 app.get('', (req, res) => {
