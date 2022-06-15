@@ -1,6 +1,8 @@
 {
   "Server": {
-    "key1": "val1",
-    "key2": "val2"
+    "testKey": "local_test",
+    "kmsKeyID": "arn:aws:kms:ap-northeast-2:521651615177:key/6ca496ce-938b-4038-af90-e1614da7535c",
+    "dbUser": "fLOwwpJTp6WkRZTRnNd10zo2jCaMuA2ZbjVkG07f6WXulx7Oors4UcSyr3zyT8JDZyzOJ7slQ2Y0bNFE+F3FeX8bJr1WaMYfW+yRuPyLmDtHC8Nl6KrxrDXbvijmEFT+a25CGZvDmIyAeqOvh0l1zJDFAcNuj7JzYIgIJGK9BWGIrC0M0r/RQC4CUZxAhBF4YO2xec/xL21RXnwZ+BzMB5CT+RfITiz+Z7yQMZMkIdKGM+kV6DLshvRdGVbMfO6iJZ+q/JJ8nnrhruQIqM5Qn9E6+g45lcLyRXXxJNk37BhSn9vARTLJf7aen2U1QhOebOZEeE2jA0KtNyivbam/WqqcPT25OFon1eIN+MqfzY4CJJ3o3k+fwOcKAn94JsOIIBHCVd/y5KKAURLWLYPq66PaaCHEdHeNvv/7jF6EoWbCXQaJkU5+IGO1rI4BWkiT5oM0kaSOOMxwp3Ejh6mElH4eAfui58HobTodDRXdFyByICuXj6swhqJHju0aDrsnMvt9kF9U3NnmvFb9jFIcfT9pGYGx3zG+iKaq1zPX+Ni2Ww4+rWXL7TCdtF3wmR7aKWtGBlFWPY+SBY9a4yOTTRtPNOrjCTb/C0Q6j+7S3jaiz2obcrDKlk0zm1d+ehcj14giBYPEhSagaxI2TOyUjtribvgEii3HzenfANHhk/0=",
+    "dbPassword": "KMoGVWQwXHQ1Vnk9ZbqNnGHAff9xy+aC/V2nTI7BgC5t8PSRtdUqS36iH4fxhrSfm6zjQX0YZC0phcAmFQWe84T85jbdHwL3uwXO/e6tqxUjVykR5tGB/WsI2SvHJmBBtrWT5HRy1kjlIojjPe/V4Xbk06ocEc8RJi1/f0pXRC/swmgPTPutu5PrnD0jWeZKbvuwL02TPVV3xN63sekNdK+tQ5IQtA2k5IuduBhxEh64Uz1nUfgxu2gXGBSm+VzcKUO6nLjIWjodLyfeTkG3rdaHGD5jxyCB1cUzWfvcczjKH/BRIQ4qxeYu/WJ2dg9HaIxPT/Ya6zCNCXyzWQ2UePbvUJZoHqLRwxGicwDG04hWLzmpWSaQk5BJVL3cT2E9bY8QxwUy6/b4qDuIsrhb8LiDRbtJzxIwUIk9qg+mZ8wkgTda3G1nDwG5ckr0XCt9dcyVcu4cp1eDmICdP2MjP6N5oVLRzgnqwHlIb6IbYdOrN1BZ/BQcxCgC4aqns/7rBANiokx28CFpgiLAf4mnzJh1X6ozYfF4DCcM3tXLZ1jIGzxqj7kqqxr6NPdRIqQtF1CpPjgFxA/hsJR0DqaCCZoAuizhdgDHsHgOZVjgqFd8ARLkGZRIwpYOdMEhE9kCI8kyJsdkPYM46Me2wSbExrf1aAU+zMzshq8MMk5aqoU="
   }
 }
