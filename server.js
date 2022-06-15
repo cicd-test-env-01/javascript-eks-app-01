@@ -9,9 +9,8 @@ const kmsKeyID = config.get('Server.kmsKeyID')
 const dbUser = config.get('Server.dbUser')
 const dbPassword = config.get('Server.dbPassword')
 
-var AWS = require('aws-sdk')
-AWS.config.update({ region: 'ap-northeast-2' })
-var kms = new AWS.KMS()
+const { KMSClient, DecryptCommand } = require('@aws-sdk/client-kms')
+const client = new KMSClient({ region: 'ap-northeast-2' })
 
 async function decrypt(source) {
   const params = {
@@ -19,11 +18,11 @@ async function decrypt(source) {
     EncryptionAlgorithm: 'RSAES_OAEP_SHA_256',
     KeyId: kmsKeyID,
   }
-  const { Plaintext } = await kms.decrypt(params).promise()
-  return Plaintext.toString()
+  const command = new DecryptCommand(params)
+  const { Plaintext } = await client.send(command)
+  return Buffer.from(Plaintext).toString('utf-8')
 }
 
-// 복호화 검증을 위한 샘플
 decrypt(dbUser).then((decoded) => console.log(decoded))
 decrypt(dbPassword).then((decoded) => console.log(decoded))
 
